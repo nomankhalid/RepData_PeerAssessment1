@@ -7,7 +7,8 @@ output: html_document
 
 ##Loading and Processing the Data
 
-```{r, echo=TRUE}
+
+```r
 library(lattice)
 
 rractivity <- read.csv("RRactivity.csv", header = TRUE, 
@@ -15,42 +16,66 @@ rractivity <- read.csv("RRactivity.csv", header = TRUE,
                        sep = ",")
 
 head(rractivity)
+```
 
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 rractivity$date <- as.Date(rractivity$date, "%Y-%m-%d")
-
 ```
 
 ##What is mean total number of steps taken per day?
 
 ###total steps
 
-```{r, echo=TRUE}
-totalsteps <- aggregate(steps ~ date, data=rractivity, sum, na.rm=TRUE)
 
+```r
+totalsteps <- aggregate(steps ~ date, data=rractivity, sum, na.rm=TRUE)
 ```
 
 ###Histogram
 
-```{r, echo=TRUE}
-hist (totalsteps$steps, main = "Daily Total Steps", xlab = "no. of days", col = "blue")
 
+```r
+hist (totalsteps$steps, main = "Daily Total Steps", xlab = "no. of days", col = "blue")
 ```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
 ###Mean
-```{r, echo=TRUE}
+
+```r
 mean(totalsteps$steps)
 ```
 
+```
+## [1] 10766
+```
+
 ###Median
-```{r, echo=TRUE}
+
+```r
 median(totalsteps$steps)
+```
+
+```
+## [1] 10765
 ```
 
 ##What is the average daily activity pattern?
 
 ###Time Series Plot
 
-```{r, echo=TRUE}
+
+```r
 time_series_plot <- tapply (rractivity$steps, rractivity$interval, mean, na.rm = TRUE)
 
 plot (row.names(time_series_plot), time_series_plot, type = "l", 
@@ -58,21 +83,34 @@ plot (row.names(time_series_plot), time_series_plot, type = "l",
       main = "Average steps per interval", col = "green")
 ```
 
-```{r, echo=TRUE}
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+
+
+```r
 max_5min_interval <- which.max(time_series_plot)
 names(max_5min_interval)
 ```
 
+```
+## [1] "835"
+```
+
 ##Imputing missing values
 
-```{r, echo=TRUE}
+
+```r
 totalNA_rractivity <- sum(is.na(rractivity))
 totalNA_rractivity
 ```
 
+```
+## [1] 2304
+```
+
 ###Filling NAs
 
-```{r, echo=TRUE}
+
+```r
 avgsteps <- aggregate(steps ~ interval, data = rractivity, FUN = mean)
 fillingNA <- numeric ()
 for (i in 1:nrow(rractivity)) {
@@ -88,35 +126,50 @@ for (i in 1:nrow(rractivity)) {
 
 ###Creating new dataset with no NAs
 
-```{r, echo=TRUE}
+
+```r
 new_rractivity <- rractivity
 new_rractivity$steps <- fillingNA 
 ```
 
 ###Histogram of total steps by day
 
-```{r, echo=TRUE}
+
+```r
 stepstotalbyday <- aggregate(steps ~ date, data = new_rractivity, sum, na.rm = TRUE)
 
 hist(stepstotalbyday$steps, main = "Total Steps by Day", xlab = "day", col = "blue")
 ```
 
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
+
 ###Mean
 
-```{r, echo=TRUE}
+
+```r
 mean(stepstotalbyday$steps)
 ```
 
+```
+## [1] 10766
+```
+
 ###Median
-```{r, echo=TRUE}
+
+```r
 median(stepstotalbyday$steps)
+```
+
+```
+## [1] 10766
 ```
 
 ##Differences in activity between weekdays and weekends
 
 I am using the filled dataset for this part (new_rractivity)
 
-```{r, echo=TRUE}
+
+```r
 day <- weekdays(new_rractivity$date)
 daylevel <- vector()
 for (i in 1:nrow(new_rractivity)) {
@@ -137,8 +190,11 @@ names(stepsByDay) <- c("interval", "daylevel", "steps")
 
 ###Weekend vs Weekday Plot
 
-```{r, echo=TRUE}
+
+```r
 xyplot(steps ~ interval | daylevel, stepsByDay, type = "l", layout = c(1, 2), xlab = "Interval", ylab = "Number of steps")
 ```
+
+![plot of chunk unnamed-chunk-15](figure/unnamed-chunk-15.png) 
 
 The graph shows that during weekdays the number of steps taken are high only at the start of day. While during weekends, there is significant activity across the day
